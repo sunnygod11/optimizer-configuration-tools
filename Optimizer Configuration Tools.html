@@ -344,7 +344,7 @@ ul.tips li{margin:5px 0;font-size:14px}
     </div>
     <p class="help" id="vdBasis" style="margin:8px 0 0"></p>
     <div class="scroll"><table id="vdTable"></table></div>
-    <p class="help">R = ความต้านทานตัวนำที่ 20 °C ของสาย PV ทองแดงชุบดีบุก class 5 (H1Z2Z2-K / EN 50618, IEC 60228) แก้ค่าในตารางได้ถ้าใช้สายรุ่นอื่น · คูณ 2 เพราะคิดทั้งสายบวกและสายลบ · กำลังสูญเสีย = ΔV × I · %ΔV = ΔV ÷ แรงดันอ้างอิง: น้อยกว่า 10 optimizer/string ใช้ จำนวน optimizer × 2 แผง × Voc (หัวข้อ 1) · ตั้งแต่ 10 optimizer/string ใช้แรงดันอ้างอิงที่กำหนด (ค่าเริ่มต้น 750 V)</p>
+    <p class="help">R = ความต้านทานตัวนำที่ 20 °C ของสาย PV ทองแดงชุบดีบุก class 5 (H1Z2Z2-K / EN 50618, IEC 60228) แก้ค่าในตารางได้ถ้าใช้สายรุ่นอื่น · คูณ 2 เพราะคิดทั้งสายบวกและสายลบ · กำลังสูญเสีย = ΔV × I · %ΔV = ΔV ÷ แรงดันอ้างอิง: น้อยกว่า 10 optimizer/string ใช้ จำนวน optimizer × 2 แผง × Vmp (หัวข้อ 1) · ตั้งแต่ 10 optimizer/string ใช้แรงดันอ้างอิงที่กำหนด (ค่าเริ่มต้น 750 V)</p>
   </details>
 
   <p class="foot">v1.9 (1 พ.ย. 2026) · ข้อมูลภายใน Huawei ใช้ออกแบบเบื้องต้น ส่งลูกค้าได้เฉพาะผล layout ยืนยันพิกัดกับ datasheet ของรุ่นที่เสนอจริงก่อนออกแบบ</p>
@@ -1315,7 +1315,7 @@ $("copyBtn").onclick=()=>{
 /* ---------------- VOLTAGE DROP ---------------- */
 const VD_I = 22;
 const VD_CABLES = [{mm2:4, r:5.09}, {mm2:6, r:3.39}, {mm2:10, r:1.95}]; // Ω/km at 20 °C, tinned Cu class 5
-const VD_NLIM = 10; // optimizers/string: below this, % is based on n × 2 × Voc; at or above, on the reference voltage
+const VD_NLIM = 10; // optimizers/string: below this, % is based on n × 2 × Vmp; at or above, on the reference voltage
 // optimizer counts per string in the active inverter's current design
 function vdDesignLens(){
   const g = activeGroup(); if (!g) return [];
@@ -1342,8 +1342,8 @@ function renderVD(){
   const fromDesign = lens.length ? `จาก design: ${lens.join(" / ")} optimizer/string` + (P.vdN>0 ? " (ใช้ค่าที่กรอกแทน)" : " · ใช้ string ที่สั้นที่สุด") : "ยังไม่มี design ใน inverter ที่เลือก กรอก optimizer/string เอง";
   if (!(n>0)) basis = `${fromDesign} · ใส่จำนวน optimizer/string เพื่อคำนวณ %ΔV`;
   else if (n < VD_NLIM){
-    if (P.voc>0){ Vref = n*2*P.voc; basis = `${fromDesign} · ${n} optimizer/string (< ${VD_NLIM}) → แรงดันอ้างอิง = ${n} × 2 × Voc ${fmt(P.voc,2)} V = <b>${fmt(Vref,1)} V</b>`; }
-    else basis = `${fromDesign} · ${n} optimizer/string (< ${VD_NLIM}) ต้องใช้ Voc: <span class="err">ใส่ Voc ในหัวข้อ 1 "แรงดันและกระแสของแผง"</span>`;
+    if (P.vmp>0){ Vref = n*2*P.vmp; basis = `${fromDesign} · ${n} optimizer/string (< ${VD_NLIM}) → แรงดันอ้างอิง = ${n} × 2 × Vmp ${fmt(P.vmp,2)} V = <b>${fmt(Vref,1)} V</b>`; }
+    else basis = `${fromDesign} · ${n} optimizer/string (< ${VD_NLIM}) ต้องใช้ Vmp: <span class="err">ใส่ Vmp ในหัวข้อ 1 "แรงดันและกระแสของแผง"</span>`;
   } else { Vref = V750; basis = `${fromDesign} · ${n} optimizer/string (≥ ${VD_NLIM}) → แรงดันอ้างอิง = <b>${fmt(Vref)} V</b>`; }
   $("vdBasis").innerHTML = basis;
   const rs = P.vdR || {};
